@@ -702,3 +702,24 @@
   color: #c0392b;
   font-weight: 600;
 }
+
+/* ── Amharic form extras ─────────────────────────────── */
+.reg-label-sub {
+  font-size: 0.7rem;
+  font-weight: 400;
+  color: var(--text-muted);
+  text-transform: none;
+  letter-spacing: 0;
+  margin-left: 6px;
+}
+
+.reg-section-subtitle {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 10px 0 4px;
+  border-bottom: 1px dashed var(--gold-border);
+  margin-bottom: 4px;
+}

@@ -3,6 +3,7 @@ import { useStudents } from '../../context/StudentsContext'
 import { useNavigate } from 'react-router-dom'
 import './Registration.css'
 
+// ── Field options ──────────────────────────────────────────
 const JUZZ_OPTIONS  = Array.from({ length: 30 }, (_, i) => `Juz' ${i + 1}`)
 const SURAH_OPTIONS = [
   'Al-Fatiha','Al-Baqarah','Al-Imran','An-Nisa','Al-Maidah',
@@ -10,39 +11,62 @@ const SURAH_OPTIONS = [
   'Hud','Yusuf',"Ar-Ra'd",'Ibrahim','Al-Hijr',
   'An-Nahl','Al-Isra','Al-Kahf','Maryam','Ta-Ha',
 ]
-const LEVELS  = ['Beginner','Intermediate','Advanced','Hafiz Track']
-const GENDERS = ['Male','Female']
-const DAYS    = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
+const CLASS_LEVELS  = ['1','2','3','4','5','6','7','8','9','10','11','12']
+const HIZ_LEVELS    = ['Beginner','Intermediate','Advanced','Hafiz Track']
+const GENDERS       = ['ወንድ (Male)','ሴት (Female)']
+const DAYS          = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
 const PAYMENT_METHODS = ['Cash','Bank Transfer','Mobile Money']
-const MONTHS  = ['January','February','March','April','May','June',
-                  'July','August','September','October','November','December']
+const MONTHS        = ['January','February','March','April','May','June',
+                       'July','August','September','October','November','December']
+const TRANSPORT_OPT = ['Yes — ትራንስፖርት አለ','No — ትራንስፖርት የለም']
 
+// ── Initial state ──────────────────────────────────────────
 const INITIAL = {
-  fullName:'', arabicName:'', dateOfBirth:'', gender:'',
-  phone:'', parentName:'', parentPhone:'', email:'',
-  address:'', level:'', startingSurah:'', startingJuz:'',
-  classDays:[], teacherNotes:'', photo: null,
+  // Step 1 — Personal (from Amharic form)
+  fullName: '',          // የተማሪ ስም አስከ አያት
+  gender: '',            // ፆታ
+  age: '',               // ዕድሜ
+  placeOfBirth: '',      // የመጠ-ቦት ስፈ.ር
+  classLevel: '',        // የክፍል ደረጃ
+  hizLevel: '',          // የቤርዐት ደረጃ (Hifz level)
+  parent1Name: '',       // የወላጅ ስም 1
+  parent1Phone: '',      // የወላጅ ስልክ 1
+  parent2Name: '',       // የወላጅ ስም 2
+  parent2Phone: '',      // የወላጅ ስልክ 2
+  monthlyFee: '',        // የወርሀዊ ክፍያ
+  studentArea: '',       // የተማሪዉ ጥሩ ቦታ (kebele/area)
+  correctionArea: '',    // የተማሪዉ የሚስተካከል ቦታ
+  specialNeeds: '',      // የተለየ ኒዝ ካለዉ
+  transport: '',         // ትራንስፖርት
+  photo: null,
+  // Step 2 — Academic
+  startingSurah: '',
+  startingJuz: '',
+  classDays: [],
+  teacherNotes: '',
 }
 
 const PAY_INITIAL = {
-  amount:'', method:'Cash', month: MONTHS[new Date().getMonth()],
-  year: String(new Date().getFullYear()), note:'',
+  amount: '', method: 'Cash',
+  month: MONTHS[new Date().getMonth()],
+  year: String(new Date().getFullYear()),
+  note: '',
 }
 
+// ── Component ──────────────────────────────────────────────
 export default function Registration() {
   const { addStudent, addPayment } = useStudents()
   const navigate = useNavigate()
 
-  const [form, setForm]           = useState(INITIAL)
-  const [errors, setErrors]       = useState({})
+  const [form, setForm]                 = useState(INITIAL)
+  const [errors, setErrors]             = useState({})
   const [photoPreview, setPhotoPreview] = useState(null)
-  const [step, setStep]           = useState(1)   // 1 Personal | 2 Academic | 3 Review | 4 Payment
-  const [payForm, setPayForm]     = useState(PAY_INITIAL)
-  const [payErrors, setPayErrors] = useState({})
-  const [done, setDone]           = useState(false)
-  const [skipPay, setSkipPay]     = useState(false)
+  const [step, setStep]                 = useState(1)
+  const [payForm, setPayForm]           = useState(PAY_INITIAL)
+  const [payErrors, setPayErrors]       = useState({})
+  const [done, setDone]                 = useState(false)
+  const [skipPay, setSkipPay]           = useState(false)
 
-  // ── form helpers ───────────────────────────────────────
   const set = (field, value) => {
     setForm(f => ({ ...f, [field]: value }))
     setErrors(e => ({ ...e, [field]: '' }))
@@ -66,22 +90,22 @@ export default function Registration() {
     setPhotoPreview(URL.createObjectURL(file))
   }
 
-  // ── validation ─────────────────────────────────────────
+  // ── Validation ─────────────────────────────────────────
   const validate = (s) => {
     const e = {}
     if (s === 1) {
-      if (!form.fullName.trim())    e.fullName    = 'Full name is required'
-      if (!form.dateOfBirth)        e.dateOfBirth = 'Date of birth is required'
-      if (!form.gender)             e.gender      = 'Select a gender'
-      if (!form.phone.trim())       e.phone       = 'Phone number is required'
-      if (!form.parentName.trim())  e.parentName  = 'Parent/guardian name is required'
-      if (!form.parentPhone.trim()) e.parentPhone = 'Parent phone is required'
+      if (!form.fullName.trim())    e.fullName    = 'ስም ያስፈልጋል / Full name required'
+      if (!form.gender)             e.gender      = 'ፆታ ይምረጡ / Select gender'
+      if (!form.age.trim())         e.age         = 'ዕድሜ ያስፈልጋል / Age required'
+      if (!form.parent1Name.trim()) e.parent1Name = 'የወላጅ ስም ያስፈልጋል / Parent name required'
+      if (!form.parent1Phone.trim())e.parent1Phone= 'የወላጅ ስልክ ያስፈልጋል / Parent phone required'
+      if (!form.monthlyFee.trim())  e.monthlyFee  = 'የወርሀዊ ክፍያ ያስፈልጋል / Monthly fee required'
     }
     if (s === 2) {
-      if (!form.level)                   e.level        = 'Select a level'
-      if (!form.startingSurah)           e.startingSurah= 'Select starting surah'
-      if (!form.startingJuz)             e.startingJuz  = "Select starting juz'"
-      if (form.classDays.length === 0)   e.classDays    = 'Select at least one class day'
+      if (!form.hizLevel)                  e.hizLevel    = 'Select Hifz level'
+      if (!form.startingSurah)             e.startingSurah = 'Select starting surah'
+      if (!form.startingJuz)               e.startingJuz = "Select starting juz'"
+      if (form.classDays.length === 0)     e.classDays   = 'Select at least one class day'
     }
     return e
   }
@@ -90,7 +114,6 @@ export default function Registration() {
     const e = {}
     if (!payForm.amount || isNaN(payForm.amount) || Number(payForm.amount) <= 0)
       e.amount = 'Enter a valid amount'
-    if (!payForm.method) e.method = 'Select payment method'
     return e
   }
 
@@ -101,7 +124,6 @@ export default function Registration() {
   }
   const prevStep = () => setStep(s => s - 1)
 
-  // ── submit registration (step 3 → 4) ──────────────────
   const handleRegister = (e) => {
     e.preventDefault()
     const e2 = validate(2)
@@ -109,29 +131,21 @@ export default function Registration() {
     setStep(4)
   }
 
-  // ── submit payment ─────────────────────────────────────
   const handlePaySubmit = () => {
     const e = validatePay()
     if (Object.keys(e).length) { setPayErrors(e); return }
-
     const studentId = addStudent({ ...form, photoPreview })
     addPayment({
-      studentId,
-      studentName: form.fullName,
-      amount: Number(payForm.amount),
-      method: payForm.method,
-      month: payForm.month,
-      year: payForm.year,
-      note: payForm.note,
+      studentId, studentName: form.fullName,
+      amount: Number(payForm.amount), method: payForm.method,
+      month: payForm.month, year: payForm.year, note: payForm.note,
     })
     setDone(true)
   }
 
-  // ── skip payment (register without paying) ─────────────
   const handleSkip = () => {
     addStudent({ ...form, photoPreview })
-    setSkipPay(true)
-    setDone(true)
+    setSkipPay(true); setDone(true)
   }
 
   const handleReset = () => {
@@ -141,12 +155,9 @@ export default function Registration() {
     setDone(false); setSkipPay(false)
   }
 
-  // ── STEP LABELS (4 steps now) ──────────────────────────
   const STEP_LABELS = ['Personal Info','Academic Info','Review','Payment']
 
-  // ══════════════════════════════════════════════════════
-  // SUCCESS SCREEN
-  // ══════════════════════════════════════════════════════
+  // ── Success screen ─────────────────────────────────────
   if (done) {
     return (
       <div className="reg-success">
@@ -161,42 +172,33 @@ export default function Registration() {
           <p className="reg-success-name">{form.fullName}</p>
           {!skipPay && (
             <p className="reg-success-sub">
-              Payment of <strong>{Number(payForm.amount).toLocaleString()} ETB</strong> recorded via <strong>{payForm.method}</strong>
+              Payment of <strong>{Number(payForm.amount).toLocaleString()} ETB</strong> via <strong>{payForm.method}</strong>
             </p>
           )}
-          {skipPay && (
-            <p className="reg-success-sub reg-success-warn">⚠️ No payment recorded yet</p>
-          )}
+          {skipPay && <p className="reg-success-sub reg-success-warn">⚠️ No payment recorded yet</p>}
           <div className="reg-success-actions">
-            <button className="reg-btn-primary" onClick={handleReset}>
-              Register Another Student
-            </button>
-            <button className="reg-btn-secondary" onClick={() => navigate('/dashboard/students')}>
-              View Students List
-            </button>
+            <button className="reg-btn-primary" onClick={handleReset}>Register Another Student</button>
+            <button className="reg-btn-secondary" onClick={() => navigate('/dashboard/students')}>View Students List</button>
           </div>
         </div>
       </div>
     )
   }
 
-  // ══════════════════════════════════════════════════════
-  // MAIN RENDER
-  // ══════════════════════════════════════════════════════
+  // ── Main render ────────────────────────────────────────
   return (
     <div className="reg-root">
-
-      {/* ── Header ── */}
+      {/* Header */}
       <div className="reg-header">
         <div className="reg-header-left">
-          <p className="reg-eyebrow">القرآن الكريم</p>
+          <p className="reg-eyebrow">የቁርአን ትምህርት ፕሮግራም · القرآن الكريم</p>
           <h1 className="reg-title">Student Registration</h1>
-          <p className="reg-subtitle">Enroll a new student in the Quran Hifz programme</p>
+          <p className="reg-subtitle">የቁርአን ትምህርት ፕሮግራም መመዝገቢያ ቅፅ</p>
         </div>
         <div className="reg-header-right">
           <div className="reg-step-pills">
             {STEP_LABELS.map((label, i) => (
-              <div key={i} className={`reg-step-pill ${step === i+1 ? 'active' : step > i+1 ? 'done' : ''}`}>
+              <div key={i} className={`reg-step-pill ${step===i+1?'active':step>i+1?'done':''}`}>
                 <span className="reg-step-num">
                   {step > i+1
                     ? <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="20 6 9 17 4 12"/></svg>
@@ -209,20 +211,20 @@ export default function Registration() {
         </div>
       </div>
 
-      {/* ── Card ── */}
+      {/* Card */}
       <div className="reg-card">
         <div className="reg-arch">
           <svg viewBox="0 0 600 28" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
             <path d="M0 28 Q150 0 300 0 Q450 0 600 28" fill="none" stroke="#D4AF37" strokeWidth="1.5"/>
             <circle cx="300" cy="0" r="5" fill="#D4AF37"/>
-            <circle cx="0"   cy="28" r="3" fill="rgba(212,175,55,0.35)"/>
+            <circle cx="0" cy="28" r="3" fill="rgba(212,175,55,0.35)"/>
             <circle cx="600" cy="28" r="3" fill="rgba(212,175,55,0.35)"/>
           </svg>
         </div>
 
         <form onSubmit={handleRegister} noValidate>
 
-          {/* ════ STEP 1 — PERSONAL ════ */}
+          {/* ════ STEP 1 — PERSONAL (Amharic form fields) ════ */}
           {step === 1 && (
             <div className="reg-section">
               <div className="reg-section-title">
@@ -232,9 +234,10 @@ export default function Registration() {
                     <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
                   </svg>
                 </span>
-                Personal Information
+                Personal Information — የግል መረጃ
               </div>
 
+              {/* Photo */}
               <div className="reg-photo-row">
                 <label className="reg-photo-upload" htmlFor="photo-input">
                   {photoPreview
@@ -246,91 +249,190 @@ export default function Registration() {
                           <polyline points="21 15 16 10 5 21"/>
                         </svg>
                         <span>Upload Photo</span>
-                      </div>
-                  }
+                      </div>}
                   <input id="photo-input" type="file" accept="image/*" onChange={handlePhoto} hidden/>
                 </label>
                 <div className="reg-photo-hint">
-                  <p>Student passport photo</p>
+                  <p>የተማሪ ፎቶ / Student photo</p>
                   <p>JPG or PNG, max 2MB</p>
                 </div>
               </div>
 
-              <div className="reg-grid-2">
-                <div className="reg-field">
-                  <label>Full Name <span className="req">*</span></label>
-                  <input type="text" placeholder="e.g. Abdullah Hassan"
-                    value={form.fullName} onChange={e => set('fullName', e.target.value)}
-                    className={errors.fullName ? 'error' : ''}/>
-                  {errors.fullName && <span className="reg-err">{errors.fullName}</span>}
-                </div>
-                <div className="reg-field">
-                  <label>Arabic Name</label>
-                  <input type="text" placeholder="الاسم بالعربية" dir="rtl"
-                    value={form.arabicName} onChange={e => set('arabicName', e.target.value)}/>
-                </div>
+              {/* የተማሪ ስም አስከ አያት — Full name to grandfather */}
+              <div className="reg-field reg-field-full">
+                <label>የተማሪ ስም አስከ አያት <span className="req">*</span>
+                  <span className="reg-label-sub"> (Student Full Name)</span>
+                </label>
+                <input type="text" placeholder="ስም / አባት ስም / አያት ስም"
+                  value={form.fullName} onChange={e => set('fullName', e.target.value)}
+                  className={errors.fullName ? 'error' : ''}/>
+                {errors.fullName && <span className="reg-err">{errors.fullName}</span>}
               </div>
 
+              {/* ፆታ / ዕድሜ */}
               <div className="reg-grid-2">
                 <div className="reg-field">
-                  <label>Date of Birth <span className="req">*</span></label>
-                  <input type="date" value={form.dateOfBirth}
-                    onChange={e => set('dateOfBirth', e.target.value)}
-                    className={errors.dateOfBirth ? 'error' : ''}/>
-                  {errors.dateOfBirth && <span className="reg-err">{errors.dateOfBirth}</span>}
-                </div>
-                <div className="reg-field">
-                  <label>Gender <span className="req">*</span></label>
+                  <label>ፆታ <span className="req">*</span>
+                    <span className="reg-label-sub"> (Gender)</span>
+                  </label>
                   <div className="reg-radio-group">
                     {GENDERS.map(g => (
-                      <label key={g} className={`reg-radio ${form.gender === g ? 'selected' : ''}`}>
+                      <label key={g} className={`reg-radio ${form.gender===g?'selected':''}`}>
                         <input type="radio" name="gender" value={g}
-                          checked={form.gender === g} onChange={() => set('gender', g)} hidden/>
-                        {g === 'Male' ? '👦' : '👧'} {g}
+                          checked={form.gender===g} onChange={() => set('gender',g)} hidden/>
+                        {g.includes('ወንድ') ? '👦' : '👧'} {g}
                       </label>
                     ))}
                   </div>
                   {errors.gender && <span className="reg-err">{errors.gender}</span>}
                 </div>
-              </div>
-
-              <div className="reg-grid-2">
                 <div className="reg-field">
-                  <label>Student Phone <span className="req">*</span></label>
-                  <input type="tel" placeholder="+251 9XX XXX XXX"
-                    value={form.phone} onChange={e => set('phone', e.target.value)}
-                    className={errors.phone ? 'error' : ''}/>
-                  {errors.phone && <span className="reg-err">{errors.phone}</span>}
-                </div>
-                <div className="reg-field">
-                  <label>Email Address</label>
-                  <input type="email" placeholder="student@email.com"
-                    value={form.email} onChange={e => set('email', e.target.value)}/>
+                  <label>ዕድሜ <span className="req">*</span>
+                    <span className="reg-label-sub"> (Age)</span>
+                  </label>
+                  <input type="number" placeholder="e.g. 12" min="3" max="80"
+                    value={form.age} onChange={e => set('age', e.target.value)}
+                    className={errors.age ? 'error' : ''}/>
+                  {errors.age && <span className="reg-err">{errors.age}</span>}
                 </div>
               </div>
 
-              <div className="reg-grid-2">
-                <div className="reg-field">
-                  <label>Parent / Guardian Name <span className="req">*</span></label>
-                  <input type="text" placeholder="Parent full name"
-                    value={form.parentName} onChange={e => set('parentName', e.target.value)}
-                    className={errors.parentName ? 'error' : ''}/>
-                  {errors.parentName && <span className="reg-err">{errors.parentName}</span>}
-                </div>
-                <div className="reg-field">
-                  <label>Parent Phone <span className="req">*</span></label>
-                  <input type="tel" placeholder="+251 9XX XXX XXX"
-                    value={form.parentPhone} onChange={e => set('parentPhone', e.target.value)}
-                    className={errors.parentPhone ? 'error' : ''}/>
-                  {errors.parentPhone && <span className="reg-err">{errors.parentPhone}</span>}
-                </div>
-              </div>
-
+              {/* የመጠ-ቦት ስፈ.ር */}
               <div className="reg-field reg-field-full">
-                <label>Home Address</label>
-                <input type="text" placeholder="City, Neighbourhood"
-                  value={form.address} onChange={e => set('address', e.target.value)}/>
+                <label>የመጠ-ቦት ስፈ.ር
+                  <span className="reg-label-sub"> (Place of Birth / Home Address)</span>
+                </label>
+                <input type="text" placeholder="ከተማ / ሰፈር"
+                  value={form.placeOfBirth} onChange={e => set('placeOfBirth', e.target.value)}/>
               </div>
+
+              {/* Class level / Hifz level */}
+              <div className="reg-grid-2">
+                <div className="reg-field">
+                  <label>የክፍል ደረጃ
+                    <span className="reg-label-sub"> (Class/Grade Level)</span>
+                  </label>
+                  <select value={form.classLevel} onChange={e => set('classLevel', e.target.value)}>
+                    <option value="">ክፍል ይምረጡ…</option>
+                    {CLASS_LEVELS.map(l => <option key={l} value={l}>ክፍል {l}</option>)}
+                  </select>
+                </div>
+                <div className="reg-field">
+                  <label>የቤርዐት ደረጃ <span className="req">*</span>
+                    <span className="reg-label-sub"> (Hifz Level)</span>
+                  </label>
+                  <select value={form.hizLevel} onChange={e => set('hizLevel', e.target.value)}
+                    className={errors.hizLevel ? 'error' : ''}>
+                    <option value="">ደረጃ ይምረጡ…</option>
+                    {HIZ_LEVELS.map(l => <option key={l} value={l}>{l}</option>)}
+                  </select>
+                  {errors.hizLevel && <span className="reg-err">{errors.hizLevel}</span>}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Continue step 1 — Parents & fees */}
+          {step === 1 && (
+            <div className="reg-section" style={{paddingTop:0}}>
+
+              {/* Parents 1 & 2 */}
+              <div className="reg-section-subtitle">
+                የወላጅ ስም እና ስልክ ቁጥር — Parent Names &amp; Phones
+              </div>
+
+              <div className="reg-grid-2">
+                <div className="reg-field">
+                  <label>1. የወላጅ ስም <span className="req">*</span>
+                    <span className="reg-label-sub"> (Parent 1 Name)</span>
+                  </label>
+                  <input type="text" placeholder="የወላጅ/አሳዳጊ ሙሉ ስም"
+                    value={form.parent1Name} onChange={e => set('parent1Name', e.target.value)}
+                    className={errors.parent1Name ? 'error' : ''}/>
+                  {errors.parent1Name && <span className="reg-err">{errors.parent1Name}</span>}
+                </div>
+                <div className="reg-field">
+                  <label>1. ስልክ ቁጥር <span className="req">*</span>
+                    <span className="reg-label-sub"> (Phone 1)</span>
+                  </label>
+                  <input type="tel" placeholder="+251 9XX XXX XXX"
+                    value={form.parent1Phone} onChange={e => set('parent1Phone', e.target.value)}
+                    className={errors.parent1Phone ? 'error' : ''}/>
+                  {errors.parent1Phone && <span className="reg-err">{errors.parent1Phone}</span>}
+                </div>
+              </div>
+
+              <div className="reg-grid-2">
+                <div className="reg-field">
+                  <label>2. የወላጅ ስም
+                    <span className="reg-label-sub"> (Parent 2 Name)</span>
+                  </label>
+                  <input type="text" placeholder="ሁለተኛ ወላጅ/አሳዳጊ ስም (አማራጭ)"
+                    value={form.parent2Name} onChange={e => set('parent2Name', e.target.value)}/>
+                </div>
+                <div className="reg-field">
+                  <label>2. ስልክ ቁጥር
+                    <span className="reg-label-sub"> (Phone 2)</span>
+                  </label>
+                  <input type="tel" placeholder="+251 9XX XXX XXX"
+                    value={form.parent2Phone} onChange={e => set('parent2Phone', e.target.value)}/>
+                </div>
+              </div>
+
+              {/* Monthly fee */}
+              <div className="reg-field reg-field-full">
+                <label>የወርሀዊ ክፍያ <span className="req">*</span>
+                  <span className="reg-label-sub"> (Monthly Fee — ETB)</span>
+                </label>
+                <input type="number" placeholder="e.g. 300" min="0"
+                  value={form.monthlyFee} onChange={e => set('monthlyFee', e.target.value)}
+                  className={errors.monthlyFee ? 'error' : ''}/>
+                {errors.monthlyFee && <span className="reg-err">{errors.monthlyFee}</span>}
+              </div>
+
+              {/* Student area / correction area */}
+              <div className="reg-grid-2">
+                <div className="reg-field">
+                  <label>የተማሪዉ ጥሩ ቦታ
+                    <span className="reg-label-sub"> (Student Area / Kebele)</span>
+                  </label>
+                  <input type="text" placeholder="ሰፈር / ቀበሌ"
+                    value={form.studentArea} onChange={e => set('studentArea', e.target.value)}/>
+                </div>
+                <div className="reg-field">
+                  <label>የተማሪዉ የሚስተካከል ቦታ
+                    <span className="reg-label-sub"> (Correction/Reference Area)</span>
+                  </label>
+                  <input type="text" placeholder="የሚስተካከልበት ቦታ"
+                    value={form.correctionArea} onChange={e => set('correctionArea', e.target.value)}/>
+                </div>
+              </div>
+
+              {/* Special needs */}
+              <div className="reg-field reg-field-full">
+                <label>የተለየ ኒዝ ካለዉ
+                  <span className="reg-label-sub"> (Special Needs, if any)</span>
+                </label>
+                <input type="text" placeholder="ካለ ያብራሩ…"
+                  value={form.specialNeeds} onChange={e => set('specialNeeds', e.target.value)}/>
+              </div>
+
+              {/* Transport */}
+              <div className="reg-field reg-field-full">
+                <label>ትራንስፖርት
+                  <span className="reg-label-sub"> (Transport)</span>
+                </label>
+                <div className="reg-radio-group">
+                  {TRANSPORT_OPT.map(t => (
+                    <label key={t} className={`reg-radio ${form.transport===t?'selected':''}`}>
+                      <input type="radio" name="transport" value={t}
+                        checked={form.transport===t} onChange={() => set('transport',t)} hidden/>
+                      {t}
+                    </label>
+                  ))}
+                </div>
+              </div>
+
             </div>
           )}
 
@@ -344,19 +446,10 @@ export default function Registration() {
                     <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
                   </svg>
                 </span>
-                Academic Information
+                Academic Information — የትምህርት መረጃ
               </div>
 
               <div className="reg-grid-2">
-                <div className="reg-field">
-                  <label>Hifz Level <span className="req">*</span></label>
-                  <select value={form.level} onChange={e => set('level', e.target.value)}
-                    className={errors.level ? 'error' : ''}>
-                    <option value="">Select level…</option>
-                    {LEVELS.map(l => <option key={l} value={l}>{l}</option>)}
-                  </select>
-                  {errors.level && <span className="reg-err">{errors.level}</span>}
-                </div>
                 <div className="reg-field">
                   <label>Starting Juz' <span className="req">*</span></label>
                   <select value={form.startingJuz} onChange={e => set('startingJuz', e.target.value)}
@@ -366,23 +459,22 @@ export default function Registration() {
                   </select>
                   {errors.startingJuz && <span className="reg-err">{errors.startingJuz}</span>}
                 </div>
-              </div>
-
-              <div className="reg-field">
-                <label>Starting Surah <span className="req">*</span></label>
-                <select value={form.startingSurah} onChange={e => set('startingSurah', e.target.value)}
-                  className={errors.startingSurah ? 'error' : ''}>
-                  <option value="">Select surah…</option>
-                  {SURAH_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
-                </select>
-                {errors.startingSurah && <span className="reg-err">{errors.startingSurah}</span>}
+                <div className="reg-field">
+                  <label>Starting Surah <span className="req">*</span></label>
+                  <select value={form.startingSurah} onChange={e => set('startingSurah', e.target.value)}
+                    className={errors.startingSurah ? 'error' : ''}>
+                    <option value="">Select surah…</option>
+                    {SURAH_OPTIONS.map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                  {errors.startingSurah && <span className="reg-err">{errors.startingSurah}</span>}
+                </div>
               </div>
 
               <div className="reg-field reg-field-full">
                 <label>Class Days <span className="req">*</span></label>
                 <div className="reg-days-grid">
                   {DAYS.map(day => (
-                    <label key={day} className={`reg-day-chip ${form.classDays.includes(day) ? 'selected' : ''}`}>
+                    <label key={day} className={`reg-day-chip ${form.classDays.includes(day)?'selected':''}`}>
                       <input type="checkbox" hidden
                         checked={form.classDays.includes(day)} onChange={() => toggleDay(day)}/>
                       <span className="reg-day-short">{day.slice(0,3)}</span>
@@ -394,8 +486,8 @@ export default function Registration() {
               </div>
 
               <div className="reg-field reg-field-full">
-                <label>Teacher Notes</label>
-                <textarea rows="3" placeholder="Any special notes about the student…"
+                <label>Teacher Notes — የመምህር ማስታወሻ</label>
+                <textarea rows="3" placeholder="Any notes about the student…"
                   value={form.teacherNotes} onChange={e => set('teacherNotes', e.target.value)}/>
               </div>
             </div>
@@ -409,11 +501,9 @@ export default function Registration() {
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                     <polyline points="14 2 14 8 20 8"/>
-                    <line x1="16" y1="13" x2="8" y2="13"/>
-                    <line x1="16" y1="17" x2="8" y2="17"/>
                   </svg>
                 </span>
-                Review & Confirm
+                Review &amp; Confirm — ማረጋገጫ
               </div>
 
               <div className="reg-review-grid">
@@ -425,34 +515,35 @@ export default function Registration() {
                   </div>
                   <div>
                     <h3 className="reg-review-name">{form.fullName}</h3>
-                    {form.arabicName && <p className="reg-review-arabic" dir="rtl">{form.arabicName}</p>}
-                    <span className={`reg-level-badge level-${form.level?.toLowerCase().replace(' ','')}`}>
-                      {form.level}
-                    </span>
+                    <span className={`reg-level-badge`}>{form.hizLevel}</span>
                   </div>
                 </div>
 
                 <div className="reg-review-block">
-                  <p className="reg-review-block-title">Personal</p>
+                  <p className="reg-review-block-title">Personal — የግል</p>
                   <div className="reg-review-rows">
-                    <ReviewRow label="Date of Birth" value={form.dateOfBirth}/>
-                    <ReviewRow label="Gender"        value={form.gender}/>
-                    <ReviewRow label="Phone"         value={form.phone}/>
-                    <ReviewRow label="Email"         value={form.email || '—'}/>
-                    <ReviewRow label="Address"       value={form.address || '—'}/>
+                    <ReviewRow label="ፆታ / Gender"         value={form.gender}/>
+                    <ReviewRow label="ዕድሜ / Age"            value={form.age}/>
+                    <ReviewRow label="የመጠ-ቦት ስፈ.ር"         value={form.placeOfBirth || '—'}/>
+                    <ReviewRow label="የክፍል ደረጃ"            value={form.classLevel || '—'}/>
+                    <ReviewRow label="የቤርዐት ደረጃ"           value={form.hizLevel}/>
+                    <ReviewRow label="ቦታ / Area"            value={form.studentArea || '—'}/>
+                    <ReviewRow label="ትራንስፖርት"             value={form.transport || '—'}/>
+                    {form.specialNeeds && <ReviewRow label="ልዩ ፍላጎት" value={form.specialNeeds}/>}
                   </div>
                 </div>
 
                 <div className="reg-review-block">
-                  <p className="reg-review-block-title">Guardian</p>
+                  <p className="reg-review-block-title">Parents — ወላጆች</p>
                   <div className="reg-review-rows">
-                    <ReviewRow label="Parent Name"  value={form.parentName}/>
-                    <ReviewRow label="Parent Phone" value={form.parentPhone}/>
+                    <ReviewRow label="ወላጅ 1" value={`${form.parent1Name} · ${form.parent1Phone}`}/>
+                    {form.parent2Name && <ReviewRow label="ወላጅ 2" value={`${form.parent2Name} · ${form.parent2Phone}`}/>}
+                    <ReviewRow label="የወርሀዊ ክፍያ" value={`${Number(form.monthlyFee).toLocaleString()} ETB`}/>
                   </div>
                 </div>
 
                 <div className="reg-review-block">
-                  <p className="reg-review-block-title">Academic</p>
+                  <p className="reg-review-block-title">Academic — ትምህርት</p>
                   <div className="reg-review-rows">
                     <ReviewRow label="Starting Surah" value={form.startingSurah}/>
                     <ReviewRow label="Starting Juz'"  value={form.startingJuz}/>
@@ -473,7 +564,7 @@ export default function Registration() {
             </div>
           )}
 
-          {/* ── Nav buttons (steps 1-3) ── */}
+          {/* Nav buttons steps 1-3 */}
           {step <= 3 && (
             <div className="reg-actions">
               {step > 1 && (
@@ -484,9 +575,7 @@ export default function Registration() {
                   <button type="button" className="reg-btn-primary" onClick={nextStep}>Next Step →</button>
                 )}
                 {step === 3 && (
-                  <button type="submit" className="reg-btn-primary">
-                    Continue to Payment →
-                  </button>
+                  <button type="submit" className="reg-btn-primary">Continue to Payment →</button>
                 )}
               </div>
             </div>
@@ -503,10 +592,9 @@ export default function Registration() {
                   <line x1="1" y1="10" x2="23" y2="10"/>
                 </svg>
               </span>
-              Payment Registration
+              Payment Registration — የወርሀዊ ክፍያ
             </div>
 
-            {/* Student recap */}
             <div className="pay-student-recap">
               <div className="pay-recap-avatar">
                 {photoPreview
@@ -515,26 +603,23 @@ export default function Registration() {
               </div>
               <div>
                 <p className="pay-recap-name">{form.fullName}</p>
-                <p className="pay-recap-sub">{form.level} · {form.startingJuz}</p>
+                <p className="pay-recap-sub">{form.hizLevel} · Monthly: {Number(form.monthlyFee).toLocaleString()} ETB</p>
               </div>
             </div>
 
             <div className="reg-grid-2">
               <div className="reg-field">
                 <label>Amount (ETB) <span className="req">*</span></label>
-                <input type="number" placeholder="e.g. 500" min="0"
+                <input type="number" placeholder={`e.g. ${form.monthlyFee || '500'}`} min="0"
                   value={payForm.amount} onChange={e => setPay('amount', e.target.value)}
                   className={payErrors.amount ? 'error' : ''}/>
                 {payErrors.amount && <span className="reg-err">{payErrors.amount}</span>}
               </div>
-
               <div className="reg-field">
                 <label>Payment Method <span className="req">*</span></label>
-                <select value={payForm.method} onChange={e => setPay('method', e.target.value)}
-                  className={payErrors.method ? 'error' : ''}>
+                <select value={payForm.method} onChange={e => setPay('method', e.target.value)}>
                   {PAYMENT_METHODS.map(m => <option key={m} value={m}>{m}</option>)}
                 </select>
-                {payErrors.method && <span className="reg-err">{payErrors.method}</span>}
               </div>
             </div>
 
@@ -561,9 +646,7 @@ export default function Registration() {
             <div className="reg-actions">
               <button type="button" className="reg-btn-secondary" onClick={() => setStep(3)}>← Back</button>
               <div className="reg-actions-right" style={{ display:'flex', gap:'12px' }}>
-                <button type="button" className="reg-btn-skip" onClick={handleSkip}>
-                  Skip Payment
-                </button>
+                <button type="button" className="reg-btn-skip" onClick={handleSkip}>Skip Payment</button>
                 <button type="button" className="reg-btn-submit" onClick={handlePaySubmit}>
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                     <polyline points="20 6 9 17 4 12"/>
@@ -580,6 +663,7 @@ export default function Registration() {
   )
 }
 
+// ── Helper ─────────────────────────────────────────────────
 function ReviewRow({ label, value }) {
   return (
     <div className="reg-review-row">

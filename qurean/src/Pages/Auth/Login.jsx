@@ -96,7 +96,7 @@ export default function Login() {
           </div>
 
           <div className="brand-name">
-            <h1 className="brand-title">Noor Academy</h1>
+            <h1 className="brand-title">Hidaya Academy</h1>
             <p className="brand-subtitle">Quran Learning & Registration System</p>
           </div>
 

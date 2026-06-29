@@ -21,7 +21,7 @@ function StudentModal({ student, onClose }) {
   const { getStudentPayments } = useStudents()
   const pays  = getStudentPayments(student.id)
   const total = pays.reduce((s, p) => s + p.amount, 0)
-  const lvColor = LEVEL_COLORS[student.level] || { bg: '#f0f0f0', color: '#333' }
+  const lvColor = LEVEL_COLORS[student.hizLevel] || { bg: '#f0f0f0', color: '#333' }
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -49,7 +49,7 @@ function StudentModal({ student, onClose }) {
             )}
             <span className="modal-level-badge"
               style={{ background: lvColor.bg, color: lvColor.color }}>
-              {student.level}
+              {student.hizLevel}
             </span>
           </div>
           <div className="modal-total-box">
@@ -68,16 +68,36 @@ function StudentModal({ student, onClose }) {
                 <circle cx="12" cy="8" r="4"/>
                 <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
               </svg>
-              Personal Information
+              Personal — የግል መረጃ
             </p>
             <div className="modal-info-grid">
-              <InfoRow icon="📅" label="Date of Birth"   value={student.dateOfBirth}/>
-              <InfoRow icon="⚧"  label="Gender"          value={student.gender}/>
-              <InfoRow icon="📞" label="Phone"            value={student.phone}/>
-              <InfoRow icon="📧" label="Email"            value={student.email || '—'}/>
-              <InfoRow icon="🏠" label="Address"          value={student.address || '—'}/>
-              <InfoRow icon="👨‍👧" label="Parent / Guardian" value={student.parentName}/>
-              <InfoRow icon="📞" label="Parent Phone"     value={student.parentPhone}/>
+              <InfoRow icon="⚧"  label="ፆታ / Gender"          value={student.gender}/>
+              <InfoRow icon="🎂" label="ዕድሜ / Age"              value={student.age || '—'}/>
+              <InfoRow icon="🏠" label="የመጠ-ቦት ስፈ.ር"           value={student.placeOfBirth || '—'}/>
+              <InfoRow icon="🏫" label="የክፍል ደረጃ"              value={student.classLevel || '—'}/>
+              <InfoRow icon="📍" label="ቦታ / Area"              value={student.studentArea || '—'}/>
+              <InfoRow icon="🚌" label="ትራንስፖርት"               value={student.transport || '—'}/>
+              {student.specialNeeds && <InfoRow icon="⭐" label="ልዩ ፍላጎት" value={student.specialNeeds}/>}
+            </div>
+          </div>
+
+          {/* ── Parents ── */}
+          <div className="modal-section">
+            <p className="modal-section-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+              </svg>
+              Parents — ወላጆች
+            </p>
+            <div className="modal-info-grid">
+              <InfoRow icon="👨‍👧" label="ወላጅ 1 ስም"    value={student.parent1Name || '—'}/>
+              <InfoRow icon="📞" label="ወላጅ 1 ስልክ"    value={student.parent1Phone || '—'}/>
+              {student.parent2Name && <>
+                <InfoRow icon="👩‍👧" label="ወላጅ 2 ስም"  value={student.parent2Name}/>
+                <InfoRow icon="📞" label="ወላጅ 2 ስልክ"  value={student.parent2Phone || '—'}/>
+              </>}
+              <InfoRow icon="💰" label="የወርሀዊ ክፍያ"   value={student.monthlyFee ? `${Number(student.monthlyFee).toLocaleString()} ETB` : '—'}/>
             </div>
           </div>
 
@@ -191,8 +211,8 @@ export default function Students() {
 
   const filtered = students.filter(s => {
     const matchSearch = s.fullName.toLowerCase().includes(search.toLowerCase()) ||
-                        s.phone.includes(search)
-    const matchLevel  = filterLevel === 'All' || s.level === filterLevel
+                        (s.parent1Phone || '').includes(search)
+    const matchLevel  = filterLevel === 'All' || s.hizLevel === filterLevel
     return matchSearch && matchLevel
   })
 
@@ -263,7 +283,7 @@ export default function Students() {
             const pays    = getStudentPayments(student.id)
             const total   = pays.reduce((s, p) => s + p.amount, 0)
             const lastPay = pays.length ? pays[pays.length - 1] : null
-            const lvColor = LEVEL_COLORS[student.level] || { bg:'#f0f0f0', color:'#333' }
+            const lvColor = LEVEL_COLORS[student.hizLevel] || { bg:'#f0f0f0', color:'#333' }
 
             return (
               <div className="sl-card" key={student.id}>
@@ -275,7 +295,7 @@ export default function Students() {
                   </div>
                   <span className="sl-level-badge"
                     style={{ background: lvColor.bg, color: lvColor.color }}>
-                    {student.level}
+                    {student.hizLevel}
                   </span>
                 </div>
 
@@ -285,7 +305,7 @@ export default function Students() {
                     <p className="sl-card-arabic" dir="rtl">{student.arabicName}</p>
                   )}
                   <div className="sl-card-meta">
-                    <span>📞 {student.phone}</span>
+                    <span>👨‍👧 {student.parent1Name || '—'}</span>
                     <span>📖 {student.startingJuz}</span>
                     <span>🗓 {student.classDays?.slice(0,2).join(', ')}{student.classDays?.length > 2 ? '…' : ''}</span>
                   </div>

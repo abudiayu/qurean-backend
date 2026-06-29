@@ -102,7 +102,7 @@ export default function Payment() {
           <div className="pay-banner-info">
             <h2>{selectedStudent.fullName}</h2>
             {selectedStudent.arabicName && <p className="pay-banner-arabic" dir="rtl">{selectedStudent.arabicName}</p>}
-            <p>{selectedStudent.level} · {selectedStudent.startingJuz} · 📞 {selectedStudent.phone}</p>
+            <p>{selectedStudent.hizLevel} · {selectedStudent.startingJuz} · 📞 {selectedStudent.parent1Phone || selectedStudent.phone || '—'}</p>
           </div>
           <div className="pay-banner-total">
             <span className="pay-banner-total-label">Total Paid</span>
@@ -287,7 +287,7 @@ export default function Payment() {
                 </div>
                 <div className="pay-row-info">
                   <p className="pay-row-name">{student.fullName}</p>
-                  <p className="pay-row-sub">{student.level} · {student.phone}</p>
+                  <p className="pay-row-sub">{student.hizLevel} · {student.parent1Phone || student.phone || '—'}</p>
                 </div>
                 <div className="pay-row-right">
                   <span className={`pay-status-badge ${pays.length > 0 ? 'badge-paid' : 'badge-unpaid'}`}>
