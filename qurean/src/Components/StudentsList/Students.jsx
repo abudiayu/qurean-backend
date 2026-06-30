@@ -203,7 +203,7 @@ function InfoRow({ icon, label, value }) {
 
 // ── Main Students Component ────────────────────────────────
 export default function Students() {
-  const { students, getStudentPayments } = useStudents()
+  const { students, getStudentPayments, loading, error } = useStudents()
   const navigate = useNavigate()
   const [search, setSearch]           = useState('')
   const [filterLevel, setFilterLevel] = useState('All')
@@ -215,6 +215,32 @@ export default function Students() {
     const matchLevel  = filterLevel === 'All' || s.hizLevel === filterLevel
     return matchSearch && matchLevel
   })
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="sl-root">
+        <div className="sl-empty">
+          <div className="sl-empty-icon" style={{fontSize:'2rem'}}>⏳</div>
+          <h3>Loading students…</h3>
+          <p>Fetching data from the database</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="sl-root">
+        <div className="sl-empty">
+          <div className="sl-empty-icon">⚠️</div>
+          <h3>Failed to load students</h3>
+          <p style={{color:'#c0392b'}}>{error}</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="sl-root">

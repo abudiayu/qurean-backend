@@ -8,12 +8,14 @@ const MONTHS = ['January','February','March','April','May','June',
                 'July','August','September','October','November','December']
 
 export default function Payment() {
-  const { students, payments, addPayment, getStudentPayments } = useStudents()
+  const { students, payments, addPayment, getStudentPayments, loading, error } = useStudents()
   const navigate = useNavigate()
 
   const [selectedStudent, setSelectedStudent] = useState(null)
   const [showForm, setShowForm]               = useState(false)
   const [search, setSearch]                   = useState('')
+  const [statusFilter, setStatusFilter]       = useState('All')
+  const [saving, setSaving]                   = useState(false)
 
   const [form, setForm]     = useState({
     amount: '', method: 'Cash',
@@ -36,27 +38,31 @@ export default function Payment() {
     return e
   }
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const e = validate()
     if (Object.keys(e).length) { setErrors(e); return }
-
-    addPayment({
-      studentId:   selectedStudent.id,
-      studentName: selectedStudent.fullName,
-      amount:      Number(form.amount),
-      method:      form.method,
-      month:       form.month,
-      year:        form.year,
-      note:        form.note,
-    })
-    setForm({ amount:'', method:'Cash', month: MONTHS[new Date().getMonth()],
-              year: String(new Date().getFullYear()), note:'' })
-    setShowForm(false)
-    setFlash(true)
-    setTimeout(() => setFlash(false), 2500)
+    setSaving(true)
+    try {
+      await addPayment({
+        studentId:   selectedStudent.id,
+        studentName: selectedStudent.fullName,
+        amount:      Number(form.amount),
+        method:      form.method,
+        month:       form.month,
+        year:        form.year,
+        note:        form.note,
+      })
+      setForm({ amount:'', method:'Cash', month: MONTHS[new Date().getMonth()],
+                year: String(new Date().getFullYear()), note:'' })
+      setShowForm(false)
+      setFlash(true)
+      setTimeout(() => setFlash(false), 2500)
+    } catch (err) {
+      setErrors({ amount: err.message || 'Failed to save payment' })
+    } finally {
+      setSaving(false)
+    }
   }
-
-  const [statusFilter, setStatusFilter] = useState('All')
 
   const totalAllPayments = payments.reduce((s, p) => s + p.amount, 0)
   const paidCount   = students.filter(s => getStudentPayments(s.id).length > 0).length
@@ -64,7 +70,7 @@ export default function Payment() {
 
   const filteredStudents = students.filter(s => {
     const matchSearch = s.fullName.toLowerCase().includes(search.toLowerCase()) ||
-                        s.phone.includes(search)
+                        (s.parent1Phone || '').includes(search)
     const hasPaid = getStudentPayments(s.id).length > 0
     const matchStatus =
       statusFilter === 'All'    ? true :
@@ -72,6 +78,31 @@ export default function Payment() {
       statusFilter === 'Unpaid' ? !hasPaid : true
     return matchSearch && matchStatus
   })
+
+  // Loading / error guard
+  if (loading) {
+    return (
+      <div className="pay-root">
+        <div className="pay-empty">
+          <div className="pay-empty-icon">⏳</div>
+          <h3>Loading payments…</h3>
+          <p>Fetching data from the database</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="pay-root">
+        <div className="pay-empty">
+          <div className="pay-empty-icon">⚠️</div>
+          <h3>Failed to load data</h3>
+          <p style={{color:'#c0392b'}}>{error}</p>
+        </div>
+      </div>
+    )
+  }
 
   // ── per-student payments view ──────────────────────────
   if (selectedStudent) {
@@ -152,7 +183,9 @@ export default function Payment() {
             </div>
             <div className="pay-form-actions">
               <button className="pay-cancel-btn" onClick={() => setShowForm(false)}>Cancel</button>
-              <button className="pay-submit-btn" onClick={handleSubmit}>Save Payment</button>
+              <button className="pay-submit-btn" onClick={handleSubmit} disabled={saving}>
+                {saving ? 'Saving…' : 'Save Payment'}
+              </button>
             </div>
           </div>
         )}

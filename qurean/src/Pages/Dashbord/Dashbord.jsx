@@ -2,6 +2,7 @@ import Registration from "../../Components/Registration/Registration"
 import Students from "../../Components/StudentsList/Students"
 import Payment from "../../Components/Payment/Payment"
 import { NavLink, Routes, Route, Navigate, useNavigate } from 'react-router-dom'
+import { supabase } from '../../lib/supabase.js'
 import './Dashbord.css'
 
 // ── Nav config ─────────────────────────────────────────────
@@ -49,7 +50,8 @@ export default function Dashbord() {
   const user     = sessionStorage.getItem('noor_user') || 'User'
   const initials = user.split('@')[0].slice(0, 2).toUpperCase()
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await supabase.auth.signOut()
     sessionStorage.clear()
     navigate('/login', { replace: true })
   }

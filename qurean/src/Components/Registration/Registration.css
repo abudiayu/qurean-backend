@@ -723,3 +723,34 @@
   border-bottom: 1px dashed var(--gold-border);
   margin-bottom: 4px;
 }
+
+/* ── Supabase save state ─────────────────────────────── */
+.reg-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255,255,255,0.4);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.reg-btn-submit:disabled,
+.reg-btn-skip:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.reg-save-error {
+  font-size: 0.78rem;
+  color: #c0392b;
+  font-weight: 500;
+  align-self: center;
+  max-width: 260px;
+}

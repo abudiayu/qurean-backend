@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "../../lib/supabase.js";
 import "./Login.css";
 
 // ── Decorative SVG Components ──────────────────────────────
@@ -43,12 +44,6 @@ const MosqueIcon = () => (
   </svg>
 );
 
-// ── Demo Credentials (replace with real API) ───────────────
-const CREDENTIALS = {
-  admin:   { username: "admin@noor.edu",   password: "admin123" },
-  manager: { username: "manager@noor.edu", password: "manager123" },
-};
-
 // ── Login Component ────────────────────────────────────────
 export default function Login() {
   const navigate = useNavigate();
@@ -59,7 +54,7 @@ export default function Login() {
   const [loading, setLoading]         = useState(false);
   const [error, setError]             = useState("");
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
     if (!username || !password) {
@@ -67,18 +62,23 @@ export default function Login() {
       return;
     }
     setLoading(true);
-    setTimeout(() => {
-      const cred = CREDENTIALS[role];
-      if (username === cred.username && password === cred.password) {
-        sessionStorage.setItem("noor_auth", "true");
-        sessionStorage.setItem("noor_role", role);
-        sessionStorage.setItem("noor_user", username);
-        navigate("/dashboard", { replace: true });
-      } else {
-        setLoading(false);
-        setError("Invalid credentials. Please try again.");
-      }
-    }, 1200);
+    try {
+      const { data, error: authErr } = await supabase.auth.signInWithPassword({
+        email:    username,
+        password: password,
+      });
+      if (authErr) throw authErr;
+
+      // Store role in session for dashboard use
+      sessionStorage.setItem("noor_role", role);
+      sessionStorage.setItem("noor_user", data.user.email);
+
+      navigate("/dashboard", { replace: true });
+    } catch (err) {
+      setError(err.message || "Invalid credentials. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

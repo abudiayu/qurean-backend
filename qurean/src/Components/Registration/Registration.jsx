@@ -66,6 +66,8 @@ export default function Registration() {
   const [payErrors, setPayErrors]       = useState({})
   const [done, setDone]                 = useState(false)
   const [skipPay, setSkipPay]           = useState(false)
+  const [saving, setSaving]             = useState(false)
+  const [saveError, setSaveError]       = useState(null)
 
   const set = (field, value) => {
     setForm(f => ({ ...f, [field]: value }))
@@ -96,10 +98,10 @@ export default function Registration() {
     if (s === 1) {
       if (!form.fullName.trim())    e.fullName    = 'ስም ያስፈልጋል / Full name required'
       if (!form.gender)             e.gender      = 'ፆታ ይምረጡ / Select gender'
-      if (!form.age.trim())         e.age         = 'ዕድሜ ያስፈልጋል / Age required'
-      if (!form.parent1Name.trim()) e.parent1Name = 'የወላጅ ስም ያስፈልጋል / Parent name required'
-      if (!form.parent1Phone.trim())e.parent1Phone= 'የወላጅ ስልክ ያስፈልጋል / Parent phone required'
-      if (!form.monthlyFee.trim())  e.monthlyFee  = 'የወርሀዊ ክፍያ ያስፈልጋል / Monthly fee required'
+      if (!form.age.toString().trim())            e.age         = 'ዕድሜ ያስፈልጋል / Age required'
+      if (!form.parent1Name.trim())               e.parent1Name = 'የወላጅ ስም ያስፈልጋል / Parent name required'
+      if (!form.parent1Phone.trim())              e.parent1Phone= 'የወላጅ ስልክ ያስፈልጋል / Parent phone required'
+      if (!form.monthlyFee.toString().trim())     e.monthlyFee  = 'የወርሀዊ ክፍያ ያስፈልጋል / Monthly fee required'
     }
     if (s === 2) {
       if (!form.hizLevel)                  e.hizLevel    = 'Select Hifz level'
@@ -131,21 +133,42 @@ export default function Registration() {
     setStep(4)
   }
 
-  const handlePaySubmit = () => {
+  const handlePaySubmit = async () => {
     const e = validatePay()
     if (Object.keys(e).length) { setPayErrors(e); return }
-    const studentId = addStudent({ ...form, photoPreview })
-    addPayment({
-      studentId, studentName: form.fullName,
-      amount: Number(payForm.amount), method: payForm.method,
-      month: payForm.month, year: payForm.year, note: payForm.note,
-    })
-    setDone(true)
+    setSaving(true)
+    setSaveError(null)
+    try {
+      const studentId = await addStudent({ ...form })
+      await addPayment({
+        studentId,
+        studentName: form.fullName,
+        amount: Number(payForm.amount),
+        method: payForm.method,
+        month:  payForm.month,
+        year:   payForm.year,
+        note:   payForm.note,
+      })
+      setDone(true)
+    } catch (err) {
+      setSaveError(err.message || 'Failed to save. Please try again.')
+    } finally {
+      setSaving(false)
+    }
   }
 
-  const handleSkip = () => {
-    addStudent({ ...form, photoPreview })
-    setSkipPay(true); setDone(true)
+  const handleSkip = async () => {
+    setSaving(true)
+    setSaveError(null)
+    try {
+      await addStudent({ ...form })
+      setSkipPay(true)
+      setDone(true)
+    } catch (err) {
+      setSaveError(err.message || 'Failed to save. Please try again.')
+    } finally {
+      setSaving(false)
+    }
   }
 
   const handleReset = () => {
@@ -297,9 +320,9 @@ export default function Registration() {
                 </div>
               </div>
 
-              {/* የመጠ-ቦት ስፈ.ር */}
+              {/* የመጠበት-ስፈር */}
               <div className="reg-field reg-field-full">
-                <label>የመጠ-ቦት ስፈ.ር
+                <label>የመጠበት-ስፈር
                   <span className="reg-label-sub"> (Place of Birth / Home Address)</span>
                 </label>
                 <input type="text" placeholder="ከተማ / ሰፈር"
@@ -318,7 +341,7 @@ export default function Registration() {
                   </select>
                 </div>
                 <div className="reg-field">
-                  <label>የቤርዐት ደረጃ <span className="req">*</span>
+                  <label>Hifz ደረጃ <span className="req">*</span>
                     <span className="reg-label-sub"> (Hifz Level)</span>
                   </label>
                   <select value={form.hizLevel} onChange={e => set('hizLevel', e.target.value)}
@@ -374,7 +397,7 @@ export default function Registration() {
                   <label>2. ስልክ ቁጥር
                     <span className="reg-label-sub"> (Phone 2)</span>
                   </label>
-                  <input type="tel" placeholder="+251 9XX XXX XXX"
+                  <input type="tel" placeholder="+251 9.. ... XXX"
                     value={form.parent2Phone} onChange={e => set('parent2Phone', e.target.value)}/>
                 </div>
               </div>
@@ -393,24 +416,24 @@ export default function Registration() {
               {/* Student area / correction area */}
               <div className="reg-grid-2">
                 <div className="reg-field">
-                  <label>የተማሪዉ ጥሩ ቦታ
-                    <span className="reg-label-sub"> (Student Area / Kebele)</span>
+                  <label>የተማሪው ጥሩ ሥነ ምግባር
+                    <span className="reg-label-sub"> (Student Behaviour / Goob Behaviour)</span>
                   </label>
-                  <input type="text" placeholder="ሰፈር / ቀበሌ"
+                  <input type="text" placeholder="ጥሩ ሥነ ምግባር"
                     value={form.studentArea} onChange={e => set('studentArea', e.target.value)}/>
                 </div>
                 <div className="reg-field">
-                  <label>የተማሪዉ የሚስተካከል ቦታ
-                    <span className="reg-label-sub"> (Correction/Reference Area)</span>
+                  <label>የተማሪው የሚሻሻል ሥነ ምግባር
+                    <span className="reg-label-sub"> (Correction/Bad Behaviour)</span>
                   </label>
-                  <input type="text" placeholder="የሚስተካከልበት ቦታ"
+                  <input type="text" placeholder="የሚሻሻል ሥነ ምግባር"
                     value={form.correctionArea} onChange={e => set('correctionArea', e.target.value)}/>
                 </div>
               </div>
 
               {/* Special needs */}
               <div className="reg-field reg-field-full">
-                <label>የተለየ ኒዝ ካለዉ
+                <label>የተለየ ፍላጎት
                   <span className="reg-label-sub"> (Special Needs, if any)</span>
                 </label>
                 <input type="text" placeholder="ካለ ያብራሩ…"
@@ -646,12 +669,27 @@ export default function Registration() {
             <div className="reg-actions">
               <button type="button" className="reg-btn-secondary" onClick={() => setStep(3)}>← Back</button>
               <div className="reg-actions-right" style={{ display:'flex', gap:'12px' }}>
-                <button type="button" className="reg-btn-skip" onClick={handleSkip}>Skip Payment</button>
-                <button type="button" className="reg-btn-submit" onClick={handlePaySubmit}>
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                    <polyline points="20 6 9 17 4 12"/>
-                  </svg>
-                  Register &amp; Save Payment
+                {saveError && (
+                  <p className="reg-save-error">⚠️ {saveError}</p>
+                )}
+                <button type="button" className="reg-btn-skip"
+                  onClick={handleSkip} disabled={saving}>
+                  {saving ? 'Saving…' : 'Skip Payment'}
+                </button>
+                <button type="button" className="reg-btn-submit"
+                  onClick={handlePaySubmit} disabled={saving}>
+                  {saving ? (
+                    <>
+                      <span className="reg-spinner"/> Saving…
+                    </>
+                  ) : (
+                    <>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <polyline points="20 6 9 17 4 12"/>
+                      </svg>
+                      Register &amp; Save Payment
+                    </>
+                  )}
                 </button>
               </div>
             </div>
