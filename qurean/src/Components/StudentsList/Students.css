@@ -25,6 +25,10 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
+  /* Clip any child that tries to overflow */
+  overflow-x: hidden;
+  min-width: 0;
+  width: 100%;
 }
 
 /* Header */
@@ -86,8 +90,11 @@
 .sl-filters {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
   flex-wrap: wrap;
+  /* Prevent the filters row itself from overflowing */
+  min-width: 0;
+  overflow: hidden;
 }
 
 .sl-search-wrap {
@@ -128,8 +135,21 @@
 .sl-level-tabs {
   display: flex;
   gap: 6px;
-  flex-wrap: wrap;
+  /* Scroll horizontally instead of overflowing */
+  overflow-x: auto;
+  flex-wrap: nowrap;
+  -webkit-overflow-scrolling: touch;
+  /* Hide scrollbar visually but keep functionality */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  /* Prevent shrinking the parent */
+  min-width: 0;
+  /* Small padding so the last tab shadow isn't clipped */
+  padding-bottom: 4px;
+  padding-right: 4px;
 }
+
+.sl-level-tabs::-webkit-scrollbar { display: none; }
 
 .sl-tab {
   padding: 8px 14px;
@@ -142,6 +162,9 @@
   cursor: pointer;
   transition: all 0.18s;
   font-family: 'Inter', sans-serif;
+  /* Never wrap or shrink — scroll instead */
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .sl-tab.active {
@@ -183,8 +206,9 @@
 /* Cards grid */
 .sl-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+  width: 100%;
 }
 
 .sl-card {
@@ -196,6 +220,9 @@
   display: flex;
   flex-direction: column;
   transition: transform 0.18s, box-shadow 0.18s;
+  /* Never exceed the grid cell width */
+  min-width: 0;
+  width: 100%;
 }
 
 .sl-card:hover {
@@ -203,18 +230,20 @@
   box-shadow: 0 10px 32px rgba(0,0,0,0.1);
 }
 
-/* Card top — avatar + badge */
+/* ── Card top — avatar + badge ── */
 .sl-card-top {
   background: linear-gradient(135deg, #0b2d26 0%, #0e3d33 100%);
-  padding: 24px 20px 16px;
+  padding: 20px 16px 14px;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
+  gap: 12px;
+  min-height: 100px;
 }
 
 .sl-avatar {
-  width: 72px;
-  height: 72px;
+  width: 68px;
+  height: 68px;
   border-radius: 50%;
   border: 3px solid var(--gold);
   overflow: hidden;
@@ -222,7 +251,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.6rem;
+  font-size: 1.5rem;
   font-weight: 700;
   color: var(--gold);
   flex-shrink: 0;
@@ -235,20 +264,26 @@
 }
 
 .sl-level-badge {
-  padding: 4px 12px;
+  padding: 4px 10px;
   border-radius: 20px;
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
+  /* Prevent overflow — wrap if needed */
+  max-width: 130px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 1;
 }
 
-/* Card body */
+/* ── Card body ── */
 .sl-card-body {
-  padding: 16px 20px 12px;
+  padding: 14px 16px 10px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
   flex: 1;
 }
 
@@ -256,57 +291,73 @@
   font-size: 1rem;
   font-weight: 700;
   color: var(--text-dark);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .sl-card-arabic {
   font-family: 'Amiri', serif;
-  font-size: 0.95rem;
+  font-size: 0.92rem;
   color: var(--text-muted);
 }
 
 .sl-card-meta {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
   margin-top: 4px;
 }
 
 .sl-card-meta span {
   font-size: 0.78rem;
   color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* Payment summary strip */
+/* ── Payment summary strip ── */
 .sl-card-pay {
   background: var(--cream);
   border-top: 1px solid #ede9dc;
-  padding: 12px 20px;
+  padding: 10px 16px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
 }
 
 .sl-pay-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 8px;
   font-size: 0.8rem;
 }
 
 .sl-pay-label {
   color: var(--text-muted);
   font-weight: 500;
+  flex-shrink: 0;
 }
 
 .sl-pay-amount {
   font-weight: 700;
   color: var(--emerald-deep);
-  font-size: 0.9rem;
+  font-size: 0.88rem;
+  text-align: right;
+  /* Prevent clipping on small screens */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 55%;
 }
 
 .sl-pay-last {
   font-weight: 600;
   color: var(--text-dark);
+  text-align: right;
+  white-space: nowrap;
 }
 
 .sl-pay-none {
@@ -315,10 +366,10 @@
   font-weight: 500;
 }
 
-/* Action button */
+/* ── Action button ── */
 .sl-card-pay-btn {
   margin: 0;
-  padding: 12px;
+  padding: 11px;
   background: var(--emerald-deep);
   color: var(--gold);
   border: none;
@@ -329,11 +380,10 @@
   transition: background 0.18s;
   width: 100%;
   text-align: center;
+  letter-spacing: 0.02em;
 }
 
-.sl-card-pay-btn:hover {
-  background: var(--emerald-light);
-}
+.sl-card-pay-btn:hover { background: var(--emerald-light); }
 
 @media (max-width: 600px) {
   .sl-grid { grid-template-columns: 1fr; }
@@ -670,4 +720,108 @@
   .modal-total-box { text-align: left; }
   .modal-body { padding: 18px 16px 22px; }
   .modal-info-label { flex: 0 0 110px; }
+}
+
+/* ═══════════════════════════════════════════════════════
+   MOBILE RESPONSIVE — Students List
+   ═══════════════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+  .sl-root { gap: 16px; }
+
+  .sl-header { flex-direction: column; align-items: stretch; gap: 12px; }
+  .sl-add-btn { width: 100%; justify-content: center; }
+
+  .sl-filters { flex-direction: column; gap: 10px; }
+  .sl-search-wrap { min-width: unset; }
+  .sl-level-tabs { overflow-x: auto; flex-wrap: nowrap; padding-bottom: 4px; }
+  .sl-level-tabs::-webkit-scrollbar { display: none; }
+  .sl-tab { white-space: nowrap; flex-shrink: 0; }
+
+  /* 2 columns on tablet */
+  .sl-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  .sl-search { font-size: 16px; }
+
+  /* Slightly smaller avatar on tablet cards */
+  .sl-avatar { width: 56px; height: 56px; font-size: 1.3rem; }
+
+  /* Tighter level badge on smaller cards */
+  .sl-level-badge { font-size: 0.6rem; padding: 3px 8px; max-width: 100px; }
+}
+
+/* Single column on phones */
+@media (max-width: 500px) {
+  .sl-grid { grid-template-columns: 1fr; gap: 12px; }
+
+  .sl-avatar { width: 64px; height: 64px; font-size: 1.4rem; }
+  .sl-level-badge { font-size: 0.65rem; max-width: 130px; }
+
+  .sl-card-top { padding: 18px 14px 12px; }
+  .sl-card-body { padding: 12px 14px 8px; }
+  .sl-card-pay  { padding: 10px 14px; }
+
+  .sl-card-name { font-size: 0.95rem; }
+}
+
+@media (max-width: 360px) {
+  .sl-title { font-size: 1.3rem; }
+  .sl-pay-amount { font-size: 0.82rem; }
+}
+
+/* ═══════════════════════════════════════════════════════
+   MOBILE RESPONSIVE — Student Detail Modal
+   ═══════════════════════════════════════════════════════ */
+
+@media (max-width: 640px) {
+  .modal-overlay { padding: 0; align-items: flex-end; }
+
+  /* Sheet slides up from bottom */
+  .modal-box {
+    border-radius: 20px 20px 0 0;
+    max-height: 92vh;
+    animation: sheetUp 0.3s cubic-bezier(0.34,1.1,0.64,1);
+  }
+
+  @keyframes sheetUp {
+    from { transform: translateY(100%); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+  }
+
+  /* Drag handle */
+  .modal-box::before {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 4px;
+    background: #e2e8f0;
+    border-radius: 4px;
+    margin: 12px auto 0;
+  }
+
+  .modal-hero {
+    flex-wrap: wrap;
+    gap: 14px;
+    padding: 16px 18px;
+  }
+
+  .modal-total-box { text-align: left; width: 100%; }
+
+  .modal-body { padding: 16px 16px 24px; gap: 18px; }
+
+  .modal-info-label { flex: 0 0 110px; font-size: 0.78rem; }
+  .modal-info-value { font-size: 0.82rem; }
+
+  /* Payment table — horizontal scroll */
+  .modal-pay-table-wrap { overflow-x: auto; }
+  .modal-pay-table { min-width: 480px; }
+
+  /* Sticky close button */
+  .modal-close { top: 10px; margin: 10px 10px 0 0; }
+}
+
+@media (max-width: 400px) {
+  .modal-avatar { width: 60px; height: 60px; font-size: 1.4rem; }
+  .modal-name   { font-size: 1rem; }
+  .modal-info-label { flex: 0 0 95px; }
 }

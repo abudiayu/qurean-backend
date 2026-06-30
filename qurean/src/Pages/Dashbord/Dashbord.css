@@ -1,6 +1,5 @@
 /* =========================================================
-   Dashbord.css — Noor Academy Dashboard
-   Deep emerald sidebar + cream content area
+   Dashbord.css — Fully Responsive (mobile-first)
    ========================================================= */
 
 @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap');
@@ -22,37 +21,42 @@
   --text-muted:    #6b7280;
   --border:        rgba(212,175,55,0.18);
   --sidebar-w:     260px;
-  --topbar-h:      68px;
+  --topbar-h:      64px;
+  --mobile-nav-h:  60px;
   --radius:        12px;
   --shadow:        0 4px 24px rgba(0,0,0,0.08);
 }
 
-/* ── Root layout ─────────────────────────────── */
+/* ── Root layout ──────────────────────────────────────── */
 .db-root {
   display: flex;
   min-height: 100vh;
   font-family: 'Inter', sans-serif;
   background: var(--cream);
+  /* Prevent ANY horizontal overflow on the whole app */
+  overflow-x: hidden;
+  max-width: 100vw;
 }
 
-/* ── SIDEBAR ─────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════
+   SIDEBAR  (desktop)
+   ═══════════════════════════════════════════════════════ */
 .db-sidebar {
   width: var(--sidebar-w);
   min-height: 100vh;
   background: linear-gradient(175deg, var(--emerald-deep) 0%, var(--emerald-mid) 60%, #081f1a 100%);
   display: flex;
   flex-direction: column;
-  padding: 0;
   position: fixed;
   top: 0;
   left: 0;
   bottom: 0;
-  z-index: 100;
+  z-index: 200;
   border-right: 1px solid var(--border);
   overflow: hidden;
+  transition: transform 0.3s ease;
 }
 
-/* subtle dot pattern on sidebar */
 .db-sidebar::before {
   content: '';
   position: absolute;
@@ -62,7 +66,7 @@
   pointer-events: none;
 }
 
-/* ── Brand ───────────────────────────────────── */
+/* Brand */
 .db-brand {
   display: flex;
   align-items: center;
@@ -97,7 +101,7 @@
   margin-top: 2px;
 }
 
-/* ── Arabic divider ──────────────────────────── */
+/* Arabic divider */
 .db-arabic-divider {
   padding: 8px 20px 16px;
   position: relative;
@@ -115,7 +119,7 @@
   border-bottom: 1px solid var(--border);
 }
 
-/* ── Navigation ──────────────────────────────── */
+/* Nav */
 .db-nav {
   display: flex;
   flex-direction: column;
@@ -178,7 +182,6 @@
 }
 
 .db-nav-icon svg { width: 100%; height: 100%; }
-
 .db-nav-text { flex: 1; }
 
 .db-nav-arrow {
@@ -195,10 +198,9 @@
   transform: translateX(0);
 }
 
-/* ── Spacer ──────────────────────────────────── */
 .db-sidebar-spacer { flex: 1; }
 
-/* ── User card ───────────────────────────────── */
+/* User card */
 .db-user-card {
   display: flex;
   align-items: center;
@@ -265,7 +267,9 @@
 
 .db-logout-btn svg { width: 15px; height: 15px; }
 
-/* ── MAIN AREA ───────────────────────────────── */
+/* ═══════════════════════════════════════════════════════
+   MAIN AREA
+   ═══════════════════════════════════════════════════════ */
 .db-main {
   margin-left: var(--sidebar-w);
   flex: 1;
@@ -274,7 +278,7 @@
   min-height: 100vh;
 }
 
-/* ── Top bar ─────────────────────────────────── */
+/* Top bar */
 .db-topbar {
   height: var(--topbar-h);
   background: var(--white);
@@ -282,24 +286,40 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 32px;
+  padding: 0 28px;
   position: sticky;
   top: 0;
   z-index: 50;
   box-shadow: 0 2px 12px rgba(0,0,0,0.04);
 }
 
-.db-topbar-left {}
+/* Hamburger — hidden on desktop */
+.db-hamburger {
+  display: none;
+  background: none;
+  border: none;
+  width: 36px;
+  height: 36px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--emerald-deep);
+  transition: background 0.18s;
+}
+
+.db-hamburger:hover { background: var(--cream-dark); }
+.db-hamburger svg { width: 22px; height: 22px; }
 
 .db-page-title {
-  font-size: 1.2rem;
+  font-size: 1.15rem;
   font-weight: 700;
   color: var(--emerald-deep);
   letter-spacing: -0.01em;
 }
 
 .db-page-sub {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   color: var(--text-muted);
   margin-top: 1px;
 }
@@ -307,96 +327,241 @@
 .db-topbar-right {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .db-date-chip {
   background: var(--cream);
   border: 1px solid #e0d9c8;
   border-radius: 20px;
-  padding: 5px 14px;
-  font-size: 0.78rem;
+  padding: 5px 12px;
+  font-size: 0.75rem;
   color: var(--text-muted);
   font-weight: 500;
+  white-space: nowrap;
 }
 
 .db-role-chip {
   background: var(--gold-dim);
   border: 1px solid rgba(212,175,55,0.3);
   border-radius: 20px;
-  padding: 5px 14px;
-  font-size: 0.78rem;
+  padding: 5px 12px;
+  font-size: 0.75rem;
   color: var(--emerald-deep);
   font-weight: 600;
-  text-transform: capitalize;
 }
 
-/* ── Content area ────────────────────────────── */
+/* Content */
 .db-content {
   flex: 1;
-  padding: 32px;
+  padding: 28px 32px;
   background: var(--cream);
+  /* Bottom padding for mobile nav bar */
 }
 
-/* ── Responsive ──────────────────────────────── */
-@media (max-width: 900px) {
-  .db-sidebar {
-    width: 220px;
-  }
-  .db-main {
-    margin-left: 220px;
-  }
+/* ═══════════════════════════════════════════════════════
+   MOBILE BOTTOM NAV BAR
+   ═══════════════════════════════════════════════════════ */
+.db-mobile-nav {
+  display: none;   /* shown only on mobile via media query */
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: var(--mobile-nav-h);
+  background: var(--emerald-deep);
+  border-top: 1px solid var(--border);
+  z-index: 300;
+  padding: 0 8px;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
 }
 
-@media (max-width: 640px) {
-  .db-sidebar {
-    display: none;
-  }
-  .db-main {
-    margin-left: 0;
-  }
-  .db-content {
-    padding: 16px;
-  }
+.db-mobile-nav-inner {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
 }
 
-/* ── Placeholder pages ───────────────────────── */
+.db-mobile-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 6px 16px;
+  border-radius: 10px;
+  text-decoration: none;
+  color: rgba(253,248,237,0.5);
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  transition: all 0.18s;
+  flex: 1;
+  text-align: center;
+}
+
+.db-mobile-nav-item svg {
+  width: 22px;
+  height: 22px;
+  margin-bottom: 1px;
+}
+
+.db-mobile-nav-item.active {
+  color: var(--gold);
+  background: rgba(212,175,55,0.1);
+}
+
+.db-mobile-nav-item:hover { color: var(--cream); }
+
+/* Mobile logout button in bottom nav */
+.db-mobile-logout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 6px 16px;
+  border: none;
+  background: none;
+  color: rgba(253,248,237,0.4);
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  flex: 1;
+  border-radius: 10px;
+  transition: all 0.18s;
+  font-family: 'Inter', sans-serif;
+}
+
+.db-mobile-logout svg { width: 22px; height: 22px; }
+.db-mobile-logout:hover { color: #e74c3c; }
+
+/* ═══════════════════════════════════════════════════════
+   OVERLAY (mobile sidebar backdrop)
+   ═══════════════════════════════════════════════════════ */
+.db-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 150;
+  backdrop-filter: blur(2px);
+  animation: fadeIn 0.2s ease;
+}
+
+.db-overlay.open { display: block; }
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ═══════════════════════════════════════════════════════
+   PLACEHOLDER
+   ═══════════════════════════════════════════════════════ */
 .db-placeholder {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 420px;
+  min-height: 320px;
   text-align: center;
   background: var(--white);
   border-radius: var(--radius);
   border: 2px dashed rgba(212,175,55,0.3);
-  padding: 48px 32px;
+  padding: 40px 24px;
   gap: 12px;
 }
 
-.db-ph-icon {
-  font-size: 3rem;
-  margin-bottom: 8px;
-}
+.db-ph-icon { font-size: 3rem; margin-bottom: 8px; }
 
 .db-placeholder h2 {
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   font-weight: 700;
   color: var(--emerald-deep);
 }
 
 .db-placeholder p {
-  font-size: 0.88rem;
+  font-size: 0.85rem;
   color: var(--text-muted);
   line-height: 1.7;
 }
 
-.db-placeholder code {
-  background: var(--cream);
-  border: 1px solid #e0d9c8;
-  border-radius: 4px;
-  padding: 1px 6px;
-  font-size: 0.82rem;
-  color: var(--emerald-light);
+/* ═══════════════════════════════════════════════════════
+   RESPONSIVE BREAKPOINTS
+   ═══════════════════════════════════════════════════════ */
+
+/* Tablet */
+@media (max-width: 1024px) {
+  :root { --sidebar-w: 230px; }
+  .db-content { padding: 24px; }
+  .db-date-chip { display: none; }
+}
+
+/* Mobile — sidebar becomes a drawer, bottom nav appears */
+@media (max-width: 768px) {
+  /* Sidebar becomes off-canvas drawer */
+  .db-sidebar {
+    transform: translateX(-100%);
+    width: 280px;
+    box-shadow: 4px 0 32px rgba(0,0,0,0.3);
+  }
+
+  .db-sidebar.open {
+    transform: translateX(0);
+  }
+
+  /* Main takes FULL width — no sidebar margin */
+  .db-main {
+    margin-left: 0;
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
+    padding-bottom: var(--mobile-nav-h);
+  }
+
+  /* Show hamburger in topbar */
+  .db-hamburger { display: flex; }
+
+  /* Topbar adjustments */
+  .db-topbar {
+    padding: 0 14px;
+    gap: 8px;
+  }
+
+  .db-topbar-left { flex: 1; min-width: 0; }
+
+  .db-page-title {
+    font-size: 1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .db-page-sub { display: none; }
+
+  .db-topbar-right { gap: 6px; flex-shrink: 0; }
+
+  .db-role-chip { display: none; }
+  .db-date-chip { display: none; }
+
+  /* Content — tight padding, no overflow */
+  .db-content {
+    padding: 14px;
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /* Show mobile bottom nav */
+  .db-mobile-nav { display: block; }
+}
+
+/* Small phones */
+@media (max-width: 400px) {
+  .db-page-title { font-size: 1rem; }
+  .db-content { padding: 12px; }
+  .db-mobile-nav-item { padding: 6px 8px; font-size: 0.6rem; }
 }

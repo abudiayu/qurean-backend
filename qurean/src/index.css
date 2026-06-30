@@ -12,6 +12,8 @@ body {
   color: #1a1a1a;
   min-height: 100vh;
   overflow-x: hidden;
+  /* iPhone safe area support */
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 img { max-width: 100%; height: auto; display: block; }
@@ -28,3 +30,15 @@ html { scroll-behavior: smooth; }
 
 /* Remove tap highlight on mobile */
 * { -webkit-tap-highlight-color: transparent; }
+
+/* ── Safe area for mobile bottom nav ───────────────────── */
+.db-mobile-nav {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* ── Prevent content being hidden behind bottom nav ─────── */
+@media (max-width: 768px) {
+  .db-main {
+    padding-bottom: calc(60px + env(safe-area-inset-bottom));
+  }
+}

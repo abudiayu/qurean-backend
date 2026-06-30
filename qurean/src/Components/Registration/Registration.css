@@ -754,3 +754,77 @@
   align-self: center;
   max-width: 260px;
 }
+
+/* ── Full mobile responsive overrides ─────────────── */
+@media (max-width: 640px) {
+  .reg-root { gap: 16px; }
+
+  .reg-header { flex-direction: column; gap: 12px; }
+
+  .reg-step-pills { flex-wrap: wrap; gap: 6px; }
+
+  .reg-step-pill { padding: 6px 10px; font-size: 0.72rem; }
+
+  .reg-step-label { display: none; }
+
+  /* Show label only for active step */
+  .reg-step-pill.active .reg-step-label { display: inline; }
+
+  .reg-card { border-radius: 12px; }
+
+  .reg-section { padding: 16px 16px 8px; gap: 14px; }
+
+  .reg-grid-2 { grid-template-columns: 1fr; }
+
+  .reg-field-full { grid-column: 1; }
+
+  .reg-days-grid { gap: 6px; }
+
+  .reg-day-full { display: none; }
+  .reg-day-short { display: inline; }
+
+  .reg-actions { padding: 14px 16px 18px; flex-wrap: wrap; gap: 10px; }
+
+  .reg-actions-right { flex-wrap: wrap; gap: 8px; }
+
+  .reg-btn-primary,
+  .reg-btn-secondary,
+  .reg-btn-submit,
+  .reg-btn-skip {
+    padding: 11px 18px;
+    font-size: 0.85rem;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .reg-btn-secondary { width: auto; }
+
+  .reg-photo-row { flex-direction: column; align-items: flex-start; }
+
+  .reg-photo-upload { width: 80px; height: 80px; }
+
+  /* Review grid */
+  .reg-review-hero { flex-direction: column; text-align: center; }
+
+  .reg-review-row { flex-direction: column; gap: 2px; align-items: flex-start; }
+
+  .reg-review-value { text-align: left; }
+
+  /* Success screen */
+  .reg-success-actions { gap: 8px; }
+  .reg-success-actions button { width: 100%; justify-content: center; }
+
+  /* Payment recap */
+  .pay-student-recap { flex-direction: column; }
+
+  /* Input font size 16px prevents iOS zoom */
+  .reg-field input,
+  .reg-field select,
+  .reg-field textarea { font-size: 16px; }
+}
+
+@media (max-width: 400px) {
+  .reg-title { font-size: 1.3rem; }
+  .reg-section { padding: 12px 12px 6px; }
+  .reg-actions { padding: 12px 12px 16px; }
+}

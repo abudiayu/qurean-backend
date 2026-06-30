@@ -601,28 +601,25 @@
 
 /* ── RESPONSIVE ──────────────────────────────────── */
 @media (max-width: 900px) {
-  .login-panel-left {
-    display: none;
-  }
-
-  .login-panel-right {
-    padding: 24px 16px;
-  }
-
-  .login-card {
-    padding: 20px 24px 28px;
-  }
+  .login-panel-left { display: none; }
+  .login-panel-right { padding: 24px 16px; }
+  .login-card { padding: 20px 24px 28px; }
 }
 
 @media (max-width: 480px) {
+  .login-panel-right { padding: 16px 12px; }
   .login-card {
     border-radius: var(--radius-md);
-    padding: 16px 18px 24px;
+    padding: 16px 16px 24px;
+    max-width: 100%;
   }
-
-  .card-title {
-    font-size: 1.4rem;
-  }
+  .card-title { font-size: 1.35rem; }
+  .arabic-text { font-size: 1.4rem; }
+  .role-switcher { margin-bottom: 20px; }
+  .login-form { gap: 14px; }
+  .field-input { padding: 11px 40px 11px 40px; font-size: 16px; /* prevent iOS zoom */ }
+  .login-btn { padding: 13px 20px; font-size: 0.9rem; }
+  .options-row { flex-direction: column; align-items: flex-start; gap: 8px; }
 }
 
 /* ── Reduced motion ──────────────────────────────── */
